@@ -1,107 +1,205 @@
-import requests
-from bs4 import BeautifulSoup
-import json
-from urllib.parse import urljoin, urlparse
-import time
-
-# Function to scrape the website
-def scrape_accordtraining():
-    base_url = "https://accordtraining.com"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    
-    try:
-        # Get the main page
-        response = requests.get(base_url, headers=headers, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Extract key information
-        data = {
-            'title': '',
-            'description': '',
-            'courses': [],
-            'contact': {},
-            'about': '',
-            'features': [],
-            'links': []
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCORD TRAINING - Singapore</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        # Get title
-        title_tag = soup.find('title')
-        if title_tag:
-            data['title'] = title_tag.get_text().strip()
-        
-        # Get meta description
-        meta_desc = soup.find('meta', attrs={'name': 'description'})
-        if meta_desc:
-            data['description'] = meta_desc.get('content', '').strip()
-        
-        # Get headings and main content
-        headings = soup.find_all(['h1', 'h2', 'h3'])
-        main_content = []
-        for heading in headings[:10]:  # Limit to first 10 headings
-            main_content.append({
-                'tag': heading.name,
-                'text': heading.get_text().strip()
-            })
-        
-        # Get all text paragraphs
-        paragraphs = soup.find_all('p')
-        text_content = [p.get_text().strip() for p in paragraphs[:15] if p.get_text().strip()]
-        
-        # Get links
-        links = soup.find_all('a', href=True)
-        for link in links[:20]:  # Limit to first 20 links
-            href = link.get('href')
-            text = link.get_text().strip()
-            if text and href:
-                data['links'].append({
-                    'text': text,
-                    'url': urljoin(base_url, href)
-                })
-        
-        # Get contact information
-        email_pattern = soup.find_all(text=lambda text: text and '@' in text)
-        phone_pattern = soup.find_all(text=lambda text: text and any(char.isdigit() for char in str(text)))
-        
-        print("Scraped data successfully!")
-        return {
-            'data': data,
-            'main_content': main_content,
-            'text_content': text_content,
-            'base_url': base_url
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
+
+        /* Sparkling lights background */
+        .sparkle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle-animation 3s infinite;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes sparkle-animation {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Content container */
+        .content {
+            text-align: center;
+            z-index: 10;
+            position: relative;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        h1 {
+            font-size: 4rem;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                         0 0 40px rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+                             0 0 40px rgba(255, 255, 255, 0.3);
+            }
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.8),
+                             0 0 60px rgba(255, 255, 255, 0.5),
+                             0 0 80px rgba(255, 255, 255, 0.3);
+            }
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            letter-spacing: 12px;
+            animation: fadeIn 2s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Shooting stars */
+        .shooting-star {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+            animation: shoot 3s linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-1000px) translateY(500px);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            h2 {
+                font-size: 1.5rem;
+                letter-spacing: 6px;
+            }
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sparkling lights container -->
+    <div class="sparkle-container" id="sparkleContainer"></div>
+
+    <!-- Main content -->
+    <div class="content">
+        <h1>ACCORD TRAINING</h1>
+        <h2>Singapore</h2>
+    </div>
+
+    <script>
+        // Create sparkling lights
+        function createSparkle() {
+            const sparkleContainer = document.getElementById('sparkleContainer');
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            // Random position
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.top = Math.random() * 100 + '%';
+            
+            // Random size
+            const size = Math.random() * 4 + 2;
+            sparkle.style.width = size + 'px';
+            sparkle.style.height = size + 'px';
+            
+            // Random animation delay
+            sparkle.style.animationDelay = Math.random() * 3 + 's';
+            sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            
+            sparkleContainer.appendChild(sparkle);
+        }
+
+        // Create multiple sparkles
+        for (let i = 0; i < 100; i++) {
+            createSparkle();
+        }
+
+        // Create shooting stars
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.classList.add('shooting-star');
+            star.style.width = Math.random() * 100 + 50 + 'px';
+            star.style.top = Math.random() * 50 + '%';
+            star.style.left = Math.random() * 100 + 100 + '%';
+            star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            
+            document.body.appendChild(star);
+            
+            setTimeout(() => {
+                star.remove();
+            }, 5000);
+        }
+
+        // Create shooting stars periodically
+        setInterval(createShootingStar, 3000);
         
-    except Exception as e:
-        print(f"Error scraping website: {e}")
-        return None
-
-# Scrape the website
-scraped_data = scrape_accordtraining()
-
-if scraped_data:
-    print(f"Title: {scraped_data['data']['title']}")
-    print(f"Description: {scraped_data['data']['description']}")
-    print(f"Found {len(scraped_data['main_content'])} headings")
-    print(f"Found {len(scraped_data['text_content'])} paragraphs")
-    print(f"Found {len(scraped_data['data']['links'])} links")
-else:
-    print("Using fallback data...")
-    scraped_data = {
-        'data': {
-            'title': 'Accord Training - Professional IT Training',
-            'description': 'Leading IT training provider',
-            'links': []
-        },
-        'main_content': [
-            {'tag': 'h1', 'text': 'Accord Training'},
-            {'tag': 'h2', 'text': 'Professional IT Training Courses'}
-        ],
-        'text_content': [
-            'Welcome to Accord Training',
-            'We provide professional IT training and certification courses.'
-        ],
-        'base_url': 'https://accordtraining.com'
-    }
+        // Create initial shooting star
+        createShootingStar();
+    </script>
+</body>
+</html>
